@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue Todo</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>{{message}}</h1>
+      <div class="main">
+        <form @submit.prevent="addTodo">
+          <input type="text" v-model="newTodo" placeholder="input todo here " />
+          <button>添加待办</button>
+        </form>
+        <ul>
+          <li v-for="todo in filteredCompletedTodos">
+            <input type="checkbox" v-model="todo.done" />
+            <span :class="{done :todo.done}">{{todo.text}}</span>
+            <button @click="removeTodo(todo)">X</button>
+          </li>
+        </ul>
+        <button @click="toggleHidden()">
+          {{completedHidden ? '显示已完成' : '隐藏已完成'}}
+        </button>
+      </div>
+    </div>
+  </body>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <script type="module">
+    import { nanoid } from "https://cdn.jsdelivr.net/npm/nanoid/nanoid.js";
+
+    const { createApp } = Vue;
+    // const message = reactive("Hello!")
+    createApp({
+      data() {
+        return {
+          completedHidden: false,
+          newTodo: "",
+          message: "Hello Vue Todo!",
+          todos: [
+            { id: nanoid(), text: "洗衣服", done: false },
+            { id: nanoid(), text: "看书", done: true },
+            { id: nanoid(), text: "做作业", done: false },
+          ],
+        };
+      },
+      computed: {
+        filteredCompletedTodos() {
+          return this.completedHidden
+            ? this.todos.filter((t) => !t.done)
+            : this.todos;
+        },
+      },
+      methods: {
+        addTodo() {
+          if (this.newTodo) {
+            this.todos.push({ id: nanoid(), text: this.newTodo, done: false });
+            this.newTodo = "";
+          } else {
+            alert("请输入待办事项。");
+          }
+        },
+        removeTodo(todo) {
+          console.log("remove todo with the id is " + todo.id);
+          const filteredTodos = this.todos.filter((x) => {
+            return x.id != todo.id;
+          });
+          this.todos = filteredTodos;
+        },
+        toggleHidden() {
+          this.completedHidden = !this.completedHidden;
+        },
+      },
+    }).mount("#app");
+  </script>
+
+  <style>
+    .done {
+      text-decoration: line-through;
+    }
+
+    #app {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .main {
+        margin-top: 20%;
+    }
+  </style>
+</html>
